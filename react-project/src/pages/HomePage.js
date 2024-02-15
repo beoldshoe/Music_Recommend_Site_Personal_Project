@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
 import YouTube from 'react-youtube';
 import OpenModal from "../components/OpenModal";
+import axios from "axios";
+import GuestBookModal from "../components/GuestBookModal";
 
 const HomePage = () => {
   const [quote, setQuote] = useState("");
   const [selectedItem, setSelectedItem] = useState('Google');
   const [searchTerm, setSearchTerm] = useState('');
-  const [songs, setSongs] = useState([]);
   const [selectedSong, setSelectedSong] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false); 
+  const [isGuestBookModalOpen, setIsGuestBookModalOpen] = useState(false);
 
   const handleOpenModal = () => {
     setIsModalOpen(true); 
@@ -22,17 +24,25 @@ const HomePage = () => {
     window.location.reload();
   }  
 
+  const handleOpenGuestBookModal = () => {
+    setIsGuestBookModalOpen(true);
+  }
+
+  const handleCloseGuestBookModal = () => {
+    setIsGuestBookModalOpen(false);
+  }
+
   useEffect(() => {
-    fetch(`${process.env.PUBLIC_URL}/Songs.json`)
-      .then(response => response.json())
-      .then(data => {
-        setSongs(data);
+    axios.get(`http://localhost:3001/Songs`)
+      .then(response => {
+        const data = response.data;
         if (data.length > 0) {
           const randomIndex = Math.floor(Math.random() * data.length);
           setSelectedSong(data[randomIndex]);
         }
-      });
-  }, []);
+      })
+      .catch(error => console.error(`Error: ${error}`));
+    }, []);
   
 
   const handleSearch = () => {
@@ -63,6 +73,28 @@ const HomePage = () => {
         setQuote(randomLine);
       });
   }, []);
+
+  const updateLikes = () => {
+    if (selectedSong) {
+      axios.get(`http://localhost:3001/Songs/${selectedSong.id}`)
+        .then(response => {
+          const updatedLikes = response.data.likes + 1;
+          axios.put(`http://localhost:3001/Songs/${selectedSong.id}`, {
+            ...response.data,
+            likes: updatedLikes
+          })
+          .then(response => {
+            setSelectedSong(response.data); 
+          });
+        })
+        .catch(error => console.error(`Error: ${error}`));
+    }
+  }
+
+  const handleEnd = (e) => {
+    e.target.stopVideo(0);
+    handleRefresh();
+  };
 
   return (
       <div style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/images/HomePage2.jpg)`, backgroundSize: 'cover', height: '100vh' }}>
@@ -115,19 +147,34 @@ const HomePage = () => {
             <button onClick={handleSearch} style={{marginLeft: '10px'}}>검색</button>
           </div>
         </div>
-      <div style={{color:'white', fontFamily:'bookkB', fontSize:'20px'}}>
-        <div style={{marginLeft:'50px',marginTop:'80px'}}>
-          {quote}
+        <div style={{color:'white', fontFamily:'bookkB', fontSize:'20px'}}>
+          <div style={{marginLeft:'50px',marginTop:'80px'}}>
+            {quote}
+          </div>
+          <div style={{display:'flex', marginTop:'20px'}}>
+            <div style={{marginLeft:'1200px'}}
+            onClick={handleOpenGuestBookModal}>
+              방명록
+              </div>
+              <GuestBookModal
+              isOpen={isGuestBookModalOpen}
+              setIsOpen={setIsGuestBookModalOpen}
+              closeMethod={handleCloseGuestBookModal}
+              />
+              <div style={{marginLeft:'50px'}}>
+                신청곡
+              </div>
+          </div>
         </div>
         <div
           style={{ 
-            marginTop:'30px',
+            marginTop:'0px',
             display: 'flex', 
             justifyContent: 'center', 
             alignItems: 'center', 
             width: '100vw' 
           }}>
-            </div>
+        </div>
         <div style={{ 
             marginTop:'10px',
             display: 'flex', 
@@ -137,30 +184,45 @@ const HomePage = () => {
           }}>
           <div>
           {selectedSong && (
-              <div>
-              <h2>{selectedSong.title}</h2>
-              <h4>{selectedSong.artist}</h4>
-            </div>
-            )}
-            {selectedSong && (
-            <YouTube
-              videoId = {selectedSong.youtubeid}
-              opts={{
-                width: "560",
-                height: "315",
-                playerVars: {
-                  autoplay: 1, 
-                  rel: 0, 
-                  modestbranding: 1, 
-                },
+            <>
+              <div style={{
+                fontFamily:'bookkB',
+                fontSize:'20px',
+                color:'white'
+              }}>
+                <h2>{selectedSong.title}</h2>
+                <h4>{selectedSong.artist}</h4>
+              </div>
+              <YouTube
+                videoId={selectedSong.youtubeid}
+                opts={{
+                  width: "560",
+                  height: "315",
+                  playerVars: {
+                    autoplay: 1, 
+                    rel: 0, 
+                    modestbranding: 1, 
+                  },
+                }}
+                onEnd={handleEnd}      
+              />
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop:'10px',
+                fontSize:'15px',
+                fontFamily:'bookkB',
+                color:'white'
               }}
-              onEnd={(e)=>{e.target.stopVideo(0);}}      
-            />
-            )}
-        </div>
-          </div>
+              onClick={updateLikes}
+              >좋아요 {selectedSong.likes}개</div>
+            </>
+          )}
             </div>
               </div>
+                </div>
+                  
             );
           };
 
