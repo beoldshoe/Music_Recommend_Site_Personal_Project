@@ -59,7 +59,7 @@ export const ModalView = styled.div.attrs((props) => ({
     border-radius: 20px;
     width: 500px;
     height: 600px;
-    background-color: #ffffff;
+    background-color: #F7EE99;
     font-family: 'bookkB';
     color: black; // 원하는 색상 코드로 변경하세요.
       >div.desc {
@@ -85,9 +85,11 @@ export const GuestBookModal = ({
   const [inputValue, setInputValue] = useState("");
   const [guestBook, setGuestBook] = useState([]);
   const [inputName, setInputName] = useState("");
+  
 
   const updateGuestBook = () => {
-    const newEntry = { name: inputName, detail: inputValue }; // 새로운 방명록 내용
+    const currentTime = new Date().toISOString(); // 현재 시간을 ISO 8601 형식의 문자열로 변환
+    const newEntry = { name: inputName, detail: inputValue, time: currentTime }; // 새로운 방명록 내용에 작성 시간 추가
   
     axios.post(`http://localhost:3001/GuestBook`, newEntry)
       .then(response => {
@@ -97,7 +99,7 @@ export const GuestBookModal = ({
         setInputName('')
       })
       .catch(error => console.error(`Error: ${error}`));
-  }
+  } 
 
   useEffect(() => {
     axios.get(`http://localhost:3001/GuestBook`)

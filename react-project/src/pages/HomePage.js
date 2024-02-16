@@ -3,6 +3,7 @@ import YouTube from 'react-youtube';
 import OpenModal from "../components/OpenModal";
 import axios from "axios";
 import GuestBookModal from "../components/GuestBookModal";
+import RequestModal from "../components/RequestModal";
 
 const HomePage = () => {
   const [quote, setQuote] = useState("");
@@ -11,6 +12,7 @@ const HomePage = () => {
   const [selectedSong, setSelectedSong] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false); 
   const [isGuestBookModalOpen, setIsGuestBookModalOpen] = useState(false);
+  const [isRequstModalOpen, setIsRequestModalOpen] = useState(false);
 
   const handleOpenModal = () => {
     setIsModalOpen(true); 
@@ -30,6 +32,14 @@ const HomePage = () => {
 
   const handleCloseGuestBookModal = () => {
     setIsGuestBookModalOpen(false);
+  }
+
+  const handleOpenRequestModal = () => {
+    setIsRequestModalOpen(true);
+  }
+  
+  const handleCloseRequestModal = () => {
+    setIsRequestModalOpen(false);
   }
 
   useEffect(() => {
@@ -126,6 +136,8 @@ const HomePage = () => {
             "카페라 생각하고 공부할 때, 생각할 때,",
             "책 읽을 때, 커피 마실 때 이용해주세요.",
             "우측 상단에 검색창도 있으니, 필요하시면 사용하세요.",
+            "노래가 마음에 든다면, 영상 하단에 있는 좋아요도 눌러주세요.",
+            "방명록도 작성해주세요.",
             "방문해주셔서 감사합니다.",
             ""]}
             isOpen={isModalOpen}
@@ -161,9 +173,16 @@ const HomePage = () => {
               setIsOpen={setIsGuestBookModalOpen}
               closeMethod={handleCloseGuestBookModal}
               />
-              <div style={{marginLeft:'50px'}}>
-                신청곡
+              <div style={{marginLeft:'50px'}}
+              onClick={handleOpenRequestModal}>
+                곡 신청서
               </div>
+              <RequestModal
+              content={[""]}
+              isOpen={isRequstModalOpen}
+              setIsOpen={setIsRequestModalOpen}
+              closeMethod={handleCloseRequestModal}
+              />
           </div>
         </div>
         <div
