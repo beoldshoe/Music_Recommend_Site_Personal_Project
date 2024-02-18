@@ -135,6 +135,7 @@ const HomePage = () => {
             "랜덤으로 듣기 좋은 노래를 추천해드립니다.", 
             "카페라 생각하고 공부할 때, 생각할 때,",
             "책 읽을 때, 커피 마실 때 이용해주세요.",
+            "듣고 싶은 노래가 있으시다면, 곡 신청서를 통해 신청해주세요",
             "우측 상단에 검색창도 있으니, 필요하시면 사용하세요.",
             "노래가 마음에 든다면, 영상 하단에 있는 좋아요도 눌러주세요.",
             "방명록도 작성해주세요.",
@@ -144,6 +145,16 @@ const HomePage = () => {
             setIsOpen={setIsModalOpen}
             closeMethod={handleCloseModal}
           />
+          <div
+              style={{
+                position: 'fixed', 
+                top: '70px', 
+                right: '50px',
+                marginLeft: '100px'
+              }}
+          >
+              관리자
+          </div>
           <div style={{marginRight:'30px'}}>
             <select value={selectedItem} onChange={(e) => setSelectedItem(e.target.value)}>
               <option value="Google">Google</option>
